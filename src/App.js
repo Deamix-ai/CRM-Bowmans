@@ -1,17 +1,28 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Leads from './pages/Leads';
-import Enquiries from './pages/Enquiries';
-import Sales from './pages/Sales';
-import Projects from './pages/Projects';
-import Stock from './pages/Stock';
-import CalendarPage from './pages/Calendar';
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Leads from "./pages/Leads";
+import Enquiries from "./pages/Enquiries";
+import Sales from "./pages/Sales";
+import Projects from "./pages/Projects";
+import Stock from "./pages/Stock";
+import CalendarPage from "./pages/Calendar";
+import CustomerProfile from "./pages/CustomerProfile"; // Import Customer Profile Page
+import app from "./firebase"; // Import the Firebase initialization
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    React.useEffect(() => {
+        const auth = getAuth(app); // Use the initialized Firebase app
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setIsLoggedIn(!!user); // Update login state based on user presence
+        });
+        return () => unsubscribe(); // Clean up the listener on unmount
+    }, []);
 
     return (
         <Router>
@@ -48,6 +59,11 @@ function App() {
                 <Route
                     path="/stock"
                     element={isLoggedIn ? <Stock /> : <Navigate to="/" />}
+                />
+                {/* Add the Customer Profile route */}
+                <Route
+                    path="/customer/:id"
+                    element={isLoggedIn ? <CustomerProfile /> : <Navigate to="/" />}
                 />
             </Routes>
         </Router>
